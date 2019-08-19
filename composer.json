@@ -1,0 +1,36 @@
+{
+  "name": "compolomus/pagination",
+  "description": "Pagination",
+  "license": "MIT",
+  "keywords": [
+    "pagination"
+  ],
+  "type": "library",
+  "authors": [
+    {
+      "name": "Koenig",
+      "email": "compolom@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Compolomus\\Pagination\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^7.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~6.0",
+    "zendframework/zend-coding-standard": "^1.0"
+  },
+  "suggest": {
+    "ext-xdebug": "^2.6.0"
+  },
+  "scripts": {
+    "cs-check": "phpcs",
+    "cs-fix": "phpcbf",
+    "test-coverage": "phpunit --coverage-clover clover.xml"
+  },
+  "minimum-stability": "stable"
+}
