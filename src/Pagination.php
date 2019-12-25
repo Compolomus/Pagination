@@ -16,6 +16,7 @@ class Pagination
 
     /**
      * Pagination constructor.
+     *
      * @param int $page
      * @param int $limit
      * @param int $total
@@ -23,7 +24,7 @@ class Pagination
      */
     public function __construct(int $page, int $limit, int $total, int $length = 3)
     {
-        $this->totalPages = (int)ceil($total / $limit);
+        $this->totalPages = (int) ceil($total / $limit);
         $this->page = $page < 1 ? 1 : ($page > $this->totalPages ? $this->totalPages : $page);
         $this->limit = $limit > 0 ? $limit : 10;
         $this->total = $total;
@@ -61,14 +62,27 @@ class Pagination
     {
         $result = [];
 
-        $leftDots = $this->page - $this->length;
-
-        if ($leftDots > 0) {
-            $result[2] = '...';
+        if ($this->page > 1) {
+            $result['minus'] = $this->page - 1;
         }
 
-        foreach ($leftDots > 0 ? range($this->page, $leftDots) : range($this->page, 2) as $value) {
-            $result[$value] = $value;
+        if ($this->page !== 1) {
+            $result['first'] = 1;
+        }
+
+        $leftDots = $this->page - $this->length;
+
+        if ($leftDots > 2) {
+            $result['leftDots'] = '...';
+        }
+
+        if ($leftDots > 0) {
+            foreach (array_reverse(range($this->page - 1, $leftDots)) as $value) {
+                $result[$value] = $value;
+            }
+            if (isset($result[1])) {
+                unset($result[1]);
+            }
         }
 
         return $result;
@@ -83,12 +97,23 @@ class Pagination
 
         $rightDots = ($this->totalPages - 1) - ($this->page + $this->length);
 
-        foreach ($rightDots > 0 ? range($this->page, $this->page + $this->length) : range($this->page, $this->totalPages - 1) as $value) {
+        foreach ($rightDots > 0 ? range($this->page + 1, $this->page + $this->length) : ($this->page + 1 < $this->totalPages ? range($this->page + 1, $this->totalPages - 1) : []) as $value) {
+            #echo $value . PHP_EOL;
             $result[$value] = $value;
         }
+        #var_dump(range($this->page + 1, $this->totalPages - 1));
+        #echo '<h1>' . var_dump($rightDots > 0) . '</h1>';
 
         if ($rightDots > 0) {
-            $result[$this->totalPages - 1] = '...';
+            $result['rightDots'] = '...';
+        }
+
+        if ($this->page !== $this->totalPages) {
+            $result['last'] = $this->totalPages;
+        }
+
+        if ($this->totalPages - $this->page > 0) {
+            $result['plus'] = $this->page + 1;
         }
 
         return $result;
@@ -99,18 +124,7 @@ class Pagination
      */
     public function get(): array
     {
-        $result = [1 => 'first'];
+        return $this->leftPad() + ['current' => $this->page] + $this->rightPad();
 
-        $result += $this->leftPad();
-
-        $result[$this->page] = 'current';
-
-        $result += $this->rightPad();
-
-        $result[$this->totalPages] = 'last';
-
-        ksort($result);
-
-        return $result;
     }
 }
