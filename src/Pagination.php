@@ -24,7 +24,7 @@ class Pagination
      */
     public function __construct(int $page, int $limit, int $total, int $length = 3)
     {
-        $this->totalPages = (int) ceil($total / $limit);
+        $this->totalPages = (int)ceil($total / $limit);
         $this->page = $page < 1 ? 1 : ($page > $this->totalPages ? $this->totalPages : $page);
         $this->limit = $limit > 0 ? $limit : 10;
         $this->total = $total;
@@ -58,7 +58,7 @@ class Pagination
     /**
      * @return array
      */
-    private function leftPad(): array
+    private function start(): array
     {
         $result = [];
 
@@ -70,7 +70,25 @@ class Pagination
             $result['first'] = 1;
         }
 
-        $leftDots = $this->page - $this->length;
+        return $result;
+    }
+
+    /**
+     * @return int
+     */
+    private function leftDots(): int
+    {
+        return $this->page - $this->length;
+    }
+
+    /**
+     * @return array
+     */
+    private function leftPad(): array
+    {
+        $result = [];
+
+        $leftDots = $this->leftDots();
 
         if ($leftDots > 2) {
             $result['leftDots'] = '...';
@@ -88,6 +106,11 @@ class Pagination
         return $result;
     }
 
+    private function rightDots(): int
+    {
+        return ($this->totalPages - 1) - ($this->page + $this->length);
+    }
+
     /**
      * @return array
      */
@@ -95,18 +118,29 @@ class Pagination
     {
         $result = [];
 
-        $rightDots = ($this->totalPages - 1) - ($this->page + $this->length);
+        $rightDots = $this->rightDots();
 
-        foreach ($rightDots > 0 ? range($this->page + 1, $this->page + $this->length) : ($this->page + 1 < $this->totalPages ? range($this->page + 1, $this->totalPages - 1) : []) as $value) {
-            #echo $value . PHP_EOL;
+        $array = $rightDots > 0
+            ? range($this->page + 1, $this->page + $this->length)
+            : ($this->page + 1 < $this->totalPages
+                ? range($this->page + 1, $this->totalPages - 1)
+                : []
+            );
+
+        foreach ($array as $value) {
             $result[$value] = $value;
         }
-        #var_dump(range($this->page + 1, $this->totalPages - 1));
-        #echo '<h1>' . var_dump($rightDots > 0) . '</h1>';
 
         if ($rightDots > 0) {
             $result['rightDots'] = '...';
         }
+
+        return $result;
+    }
+
+    private function end(): array
+    {
+        $result = [];
 
         if ($this->page !== $this->totalPages) {
             $result['last'] = $this->totalPages;
@@ -124,7 +158,6 @@ class Pagination
      */
     public function get(): array
     {
-        return $this->leftPad() + ['current' => $this->page] + $this->rightPad();
-
+        return array_merge($this->start(), $this->leftPad(), ['current' => $this->page], $this->rightPad(), $this->end());
     }
 }

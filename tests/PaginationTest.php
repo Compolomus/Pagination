@@ -35,7 +35,7 @@ class PaginationTest extends TestCase
 
     public function testGet(): void
     {
-        $counts = [10, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 10];
+        $counts = [11, 11, 13, 13, 13, 13, 13, 13, 19, 20, 21, 21, 20, 19, 18, 17, 16, 15, 14, 13, 11, 11];
 
         for ($i = 0; $i < 22; $i++) {
             $nav = new Pagination($i, 10, 200, 7);
