@@ -106,6 +106,9 @@ class Pagination
         return $result;
     }
 
+    /**
+     * @return int
+     */
     private function rightDots(): int
     {
         return ($this->totalPages - 1) - ($this->page + $this->length);
@@ -138,6 +141,9 @@ class Pagination
         return $result;
     }
 
+    /**
+     * @return array
+     */
     private function end(): array
     {
         $result = [];
