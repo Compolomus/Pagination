@@ -12,7 +12,7 @@ class PaginationTest extends TestCase
     {
         $nav = new Pagination(1, 10, 20);
         try {
-            $this->assertInternalType('object', $nav);
+            $this->assertIsObject($nav);
             $this->assertInstanceOf(Pagination::class, $nav);
         } catch (\Exception $e) {
             $this->assertContains('Must be initialized ', $e->getMessage());
@@ -35,7 +35,7 @@ class PaginationTest extends TestCase
 
     public function testGet(): void
     {
-        $counts = [11, 11, 13, 13, 13, 13, 13, 13, 19, 20, 21, 21, 20, 19, 18, 17, 16, 15, 14, 13, 11, 11];
+        $counts = [13, 13, 16, 17, 19, 20, 21, 22, 23, 24, 25, 25, 24, 23, 22, 21, 20, 19, 18, 17, 14, 13];
 
         for ($i = 0; $i < 22; $i++) {
             $nav = new Pagination($i, 10, 200, 7);

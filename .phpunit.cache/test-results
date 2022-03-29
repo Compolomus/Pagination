@@ -1,0 +1,1 @@
+{"version":1,"defects":{"Compolomus\\Pagination\\PaginationTest::testGet":3},"times":{"Compolomus\\Pagination\\PaginationTest::test__construct":0,"Compolomus\\Pagination\\PaginationTest::testGetOffset":0,"Compolomus\\Pagination\\PaginationTest::testGetLimit":0,"Compolomus\\Pagination\\PaginationTest::testGet":0.003,"Compolomus\\Pagination\\PaginationTest::testGetEnd":0}}

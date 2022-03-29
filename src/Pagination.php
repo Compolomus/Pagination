@@ -35,7 +35,8 @@ class Pagination
         $this->uiKeys = $uiKeys;
     }
     
-    private function init() {
+    private function init(): string
+    {
 		$pos = 'full';
 		
 		switch ($this->page) {
@@ -83,7 +84,7 @@ class Pagination
     /**
      * @return array
      */
-    public function start(): array
+    private function start(): array
     {
         $result = [];
 
@@ -106,7 +107,7 @@ class Pagination
     /**
      * @return array
      */
-    public function end(): array
+    private function end(): array
     {
         $result = [];
 
@@ -182,7 +183,7 @@ class Pagination
         return $result;
     }
     
-    private function getCurrent()
+    private function getCurrent(): array
     {
 		if ($this->uiKeys) {
 				$result['current'] = $this->page;
