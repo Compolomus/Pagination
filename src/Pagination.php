@@ -86,21 +86,29 @@ class Pagination
     /**
      * @return array
      */
-    private function start(): array
+    private function uiStart(): array
     {
         $result = [];
 
-        if ($this->uiKeys) {
-            if ($this->page > 1) {
-                $result['prev'] = $this->page - 1;
-            }
-            if ($this->page !== 1) {
-                $result['first'] = 1;
-            }
-            if ($this->page > 3) {
-                $result['second'] = 2;
-            }
+        if ($this->page > 1) {
+            $result['prev'] = $this->page - 1;
         }
+        if ($this->page !== 1) {
+            $result['first'] = 1;
+        }
+        if ($this->page > 3) {
+            $result['second'] = 2;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
+    private function start(): array
+    {
+        $result = $this->uiKeys ? $this->uiStart() : [];
 
         return $this->pos !== 'full' ? $result : [];
     }
@@ -108,21 +116,29 @@ class Pagination
     /**
      * @return array
      */
-    private function end(): array
+    private function uiEnd(): array
     {
         $result = [];
 
-        if ($this->uiKeys) {
-            if ($this->page !== $this->totalPages) {
-                $result['last'] = $this->totalPages;
-            }
-            if ($this->totalPages - $this->page > 0) {
-                $result['next'] = $this->page + 1;
-            }
-            if ($this->totalPages - $this->page + $this->length > 3) {
-                $result['preLast'] = $this->totalPages - 1;
-            }
+        if ($this->page !== $this->totalPages) {
+            $result['last'] = $this->totalPages;
         }
+        if ($this->totalPages - $this->page > 0) {
+            $result['next'] = $this->page + 1;
+        }
+        if ($this->totalPages - $this->page + $this->length > 3) {
+            $result['preLast'] = $this->totalPages - 1;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
+    private function end(): array
+    {
+        $result = $this->uiKeys ? $this->uiEnd() : [];
 
         return $this->pos !== 'full' ? $result : [];
     }
@@ -153,19 +169,21 @@ class Pagination
         $result = [];
         $for = [];
 
-            if ($this->page - $this->length > 1) {
-                $result[] = 1;
+        if ($this->page - $this->length > 1) {
+            $result[] = 1;
+        }
+        foreach (range($this->page - 1, $this->page - $this->length) as $value) {
+            if ($value > 0) {
+                $for[] = $value;
             }
-
-            foreach (range($this->page - 1, $this->page - $this->length) as $value) {
-                if ($value > 0) {
-                    $for[] = $value;
-                }
-            }
+        }
 
         return $this->pos === 'full' ? [] : array_merge($result, $this->leftDots(), array_reverse($for));
     }
 
+    /**
+     * @return array
+     */
     private function rightDots(): array
     {
         $result = [];
@@ -202,6 +220,24 @@ class Pagination
     /**
      * @return array
      */
+    private function full(): array
+    {
+        $result = [];
+
+        foreach (range(1, $this->totalPages) as $value) {
+            if ($this->uiKeys && $value === $this->page) {
+                $result['current'] = $value;
+            } else {
+                $result[] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
     private function getCurrent(): array
     {
         if ($this->uiKeys) {
@@ -211,14 +247,7 @@ class Pagination
         }
 
         if ($this->pos === 'full') {
-            $result = [];
-            foreach (range(1, $this->totalPages) as $value) {
-                if ($this->uiKeys && $value === $this->page) {
-                    $result['current'] = $value;
-                } else {
-                    $result[] = $value;
-                }
-            }
+            $result = $this->full();
         }
 
         return $result;
