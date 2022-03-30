@@ -29,7 +29,7 @@ class Pagination
      */
     public function __construct(int $page, int $limit, int $total, int $length = 3, bool $uiKeys = false)
     {
-        $this->totalPages = (int)ceil($total / $limit);
+        $this->totalPages = (int) ceil($total / $limit);
         $this->page = $page > 1 ? ($page > $this->totalPages ? 1 : $page) : 1;
         $this->limit = $limit > 0 ? $limit : 10;
         $this->total = $total;
@@ -46,18 +46,17 @@ class Pagination
                 $pos = 'full';
                 break;
             case (($this->page - $this->length) < 3):
-                $pos  = 'noLeftDots';
+                $pos = 'noLeftDots';
                 break;
             case (($this->page - $this->length) >= 3 && ($this->totalPages - $this->page - $this->length) > 1):
-                $pos  = 'center';
+                $pos = 'center';
                 break;
             case (abs($this->totalPages - $this->page - $this->length) >= 0):
-                $pos  = 'noRightDots';
+                $pos = 'noRightDots';
                 break;
         }
 
         return $pos;
-
     }
 
     /**
@@ -91,19 +90,19 @@ class Pagination
     {
         $result = [];
 
-        if ($this->page > 1) {
-            $result['prev'] = $this->page - 1;
+        if ($this->uiKeys) {
+            if ($this->page > 1) {
+                $result['prev'] = $this->page - 1;
+            }
+            if ($this->page !== 1) {
+                $result['first'] = 1;
+            }
+            if ($this->page > 3) {
+                $result['second'] = 2;
+            }
         }
 
-        if ($this->page !== 1) {
-            $result['first'] = 1;
-        }
-
-        if ($this->page > 3) {
-            $result['second'] = 2;
-        }
-
-        return $this->uiKeys ? $result : [];
+        return $this->pos !== 'full' ? $result : [];
     }
 
     /**
@@ -113,19 +112,19 @@ class Pagination
     {
         $result = [];
 
-        if ($this->page !== $this->totalPages) {
-            $result['last'] = $this->totalPages;
+        if ($this->uiKeys) {
+            if ($this->page !== $this->totalPages) {
+                $result['last'] = $this->totalPages;
+            }
+            if ($this->totalPages - $this->page > 0) {
+                $result['next'] = $this->page + 1;
+            }
+            if ($this->totalPages - $this->page + $this->length > 3) {
+                $result['preLast'] = $this->totalPages - 1;
+            }
         }
 
-        if ($this->totalPages - $this->page > 0) {
-            $result['next'] = $this->page + 1;
-        }
-
-        if ($this->totalPages - $this->page + $this->length > 3) {
-            $result['preLast'] = $this->totalPages - 1;
-        }
-
-        return $this->uiKeys ? $result : [];
+        return $this->pos !== 'full' ? $result : [];
     }
 
     /**
@@ -136,21 +135,21 @@ class Pagination
         $result = [];
         $for = [];
 
-        if ($this->page - $this->length > 1) {
-            $result[] = 1;
-        }
-
-        if ($this->pos !== 'noLeftDots') {
-            if ($this->uiKeys) {
-                $result['leftDots'] = '...';
-            } else {
-                $result[] = '...';
+        if ($this->pos !== 'full') {
+            if ($this->page - $this->length > 1) {
+                $result[] = 1;
             }
-        }
-
-        foreach (range($this->page - 1, $this->page - $this->length) as $value) {
-            if ($value > 0) {
-                $for[] = $value;
+            if ($this->pos !== 'noLeftDots') {
+                if ($this->uiKeys) {
+                    $result['leftDots'] = '...';
+                } else {
+                    $result[] = '...';
+                }
+            }
+            foreach (range($this->page - 1, $this->page - $this->length) as $value) {
+                if ($value > 0) {
+                    $for[] = $value;
+                }
             }
         }
 
@@ -164,22 +163,22 @@ class Pagination
     {
         $result = [];
 
-        foreach (range($this->page + 1, $this->page + $this->length) as $value) {
-            if ($value <= $this->totalPages) {
-                $result[] = $value;
+        if ($this->pos !== 'full') {
+            foreach (range($this->page + 1, $this->page + $this->length) as $value) {
+                if ($value <= $this->totalPages) {
+                    $result[] = $value;
+                }
             }
-        }
-
-        if ($this->pos !== 'noRightDots') {
-            if ($this->uiKeys) {
-                $result['rightDots'] = '...';
-            } else {
-                $result[] = '...';
+            if ($this->pos !== 'noRightDots') {
+                if ($this->uiKeys) {
+                    $result['rightDots'] = '...';
+                } else {
+                    $result[] = '...';
+                }
             }
-        }
-
-        if ($this->totalPages - $this->page - $this->length > 0) {
-            $result[] = $this->totalPages;
+            if ($this->totalPages - $this->page - $this->length > 0) {
+                $result[] = $this->totalPages;
+            }
         }
 
         return $result;
@@ -196,6 +195,17 @@ class Pagination
             $result[] = $this->page;
         }
 
+        if ($this->pos === 'full') {
+            $result = [];
+            foreach (range(1, $this->totalPages) as $value) {
+                if ($this->uiKeys && $value === $this->page) {
+                    $result['current'] = $value;
+                } else {
+                    $result[] = $value;
+                }
+            }
+        }
+
         return $result;
     }
 
@@ -205,5 +215,13 @@ class Pagination
     public function get(): array
     {
         return array_merge($this->start(), $this->leftPad(), $this->getCurrent(), $this->rightPad(), $this->end());
+    }
+
+    /**
+     * @return int
+     */
+    public function getTotalPages(): int
+    {
+        return $this->totalPages;
     }
 }
