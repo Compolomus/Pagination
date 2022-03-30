@@ -3,3 +3,5 @@
 /index.php
 /composer.lock
 /clover.xml
+/.phpunit.result.cache
+/phpunit.cache/
