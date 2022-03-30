@@ -29,7 +29,7 @@ class Pagination
      */
     public function __construct(int $page, int $limit, int $total, int $length = 3, bool $uiKeys = false)
     {
-        $this->totalPages = (int)ceil($total / $limit);
+        $this->totalPages = (int) ceil($total / $limit);
         $this->page = $page > 1 ? ($page > $this->totalPages ? 1 : $page) : 1;
         $this->limit = $limit > 0 ? $limit : 10;
         $this->total = $total;
@@ -130,6 +130,24 @@ class Pagination
     /**
      * @return array
      */
+    private function leftDots(): array
+    {
+        $result = [];
+
+        if ($this->pos !== 'noLeftDots') {
+            if ($this->uiKeys) {
+                $result['leftDots'] = '...';
+            } else {
+                $result[] = '...';
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array
+     */
     private function leftPad(): array
     {
         $result = [];
@@ -138,20 +156,29 @@ class Pagination
             if ($this->page - $this->length > 1) {
                 $result[] = 1;
             }
-            if ($this->pos !== 'noLeftDots') {
-                if ($this->uiKeys) {
-                    $result['leftDots'] = '...';
-                } else {
-                    $result[] = '...';
-                }
-            }
+
             foreach (range($this->page - 1, $this->page - $this->length) as $value) {
                 if ($value > 0) {
                     $for[] = $value;
                 }
             }
 
-        return $this->pos === 'full' ? [] : array_merge($result, array_reverse($for));
+        return $this->pos === 'full' ? [] : array_merge($result, $this->leftDots(), array_reverse($for));
+    }
+
+    private function rightDots(): array
+    {
+        $result = [];
+
+        if ($this->pos !== 'noRightDots') {
+            if ($this->uiKeys) {
+                $result['rightDots'] = '...';
+            } else {
+                $result[] = '...';
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -166,18 +193,10 @@ class Pagination
                 $result[] = $value;
             }
         }
-        if ($this->pos !== 'noRightDots') {
-            if ($this->uiKeys) {
-                $result['rightDots'] = '...';
-            } else {
-                $result[] = '...';
-            }
-        }
-        if ($this->totalPages - $this->page - $this->length > 0) {
-            $result[] = $this->totalPages;
-        }
 
-        return $this->pos === 'full' ? [] : $result;
+        $last = ($this->totalPages - $this->page - $this->length > 0) ? [$this->totalPages] : [];
+
+        return $this->pos === 'full' ? [] : array_merge($result, $this->rightDots(), $last);
     }
 
     /**
