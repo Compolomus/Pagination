@@ -28,7 +28,8 @@ echo count($items);
 
 #1
 
-$nav = new Pagination((int) $page, 10, count($items), 7);
+$nav = new Pagination((int) $page, 10, count($items), 7, true);
+$navIntegers = new Pagination((int) $page, 10, count($items), 7);
 
 for ($i = $nav->getOffset(); $i < $nav->getEnd(); $i++) {
     echo '<div>' . $items[$i] . '</div>';
@@ -57,27 +58,58 @@ echo '<pre>' . print_r($nav->get(), true) . '</pre>';
 /*
     Array
     (
-        [minus] => 9
+        [prev] => 9
         [first] => 1
+        [second] => 2
+        [0] => 1
         [leftDots] => ...
-        [0] => 3
-        [1] => 4
-        [2] => 5
-        [3] => 6
-        [4] => 7
-        [5] => 8
-        [6] => 9
+        [1] => 3
+        [2] => 4
+        [3] => 5
+        [4] => 6
+        [5] => 7
+        [6] => 8
+        [7] => 9
         [current] => 10
-        [7] => 11
-        [8] => 12
-        [9] => 13
-        [10] => 14
-        [11] => 15
-        [12] => 16
-        [13] => 17
+        [8] => 11
+        [9] => 12
+        [10] => 13
+        [11] => 14
+        [12] => 15
+        [13] => 16
+        [14] => 17
         [rightDots] => ...
+        [15] => 20
         [last] => 20
-        [plus] => 11
+        [next] => 11
+        [preLast] => 19
+    )
+*/
+
+echo '<pre>' . print_r($navIntegers->get(), true) . '</pre>';
+
+/*
+    Array
+    (
+        [0] => 1
+        [1] => ...
+        [2] => 3
+        [3] => 4
+        [4] => 5
+        [5] => 6
+        [6] => 7
+        [7] => 8
+        [8] => 9
+        [9] => 10
+        [10] => 11
+        [11] => 12
+        [12] => 13
+        [13] => 14
+        [14] => 15
+        [15] => 16
+        [16] => 17
+        [17] => ...
+        [18] => 20
     )
 */
 

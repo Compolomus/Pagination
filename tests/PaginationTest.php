@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Compolomus\Pagination;
 
@@ -7,15 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 class PaginationTest extends TestCase
 {
-
     public function test__construct(): void
     {
         $nav = new Pagination(1, 10, 20);
         try {
-            $this->assertInternalType('object', $nav);
+            $this->assertIsObject($nav);
             $this->assertInstanceOf(Pagination::class, $nav);
         } catch (\Exception $e) {
-            $this->assertContains('Must be initialized ', $e->getMessage());
+            $this->assertStringContainsString('Must be initialized ', $e->getMessage());
         }
     }
 
@@ -23,23 +23,46 @@ class PaginationTest extends TestCase
     {
         $nav1 = new Pagination(1, 10, 20);
         $nav2 = new Pagination(2, 5, 30);
-        $this->assertEquals($nav1->getOffset(), 0);
-        $this->assertEquals($nav2->getOffset(), 5);
+        $this->assertEquals(0, $nav1->getOffset());
+        $this->assertEquals(5, $nav2->getOffset());
     }
 
     public function testGetLimit(): void
     {
         $nav = new Pagination(1, 10, 20);
-        $this->assertEquals($nav->getLimit(), 10);
+        $this->assertEquals(10, $nav->getLimit());
     }
 
     public function testGet(): void
     {
-        $counts = [11, 11, 13, 13, 13, 13, 13, 13, 19, 20, 21, 21, 20, 19, 18, 17, 16, 15, 14, 13, 11, 11];
+        $results = [
+            [1, 2, 3, 4, 5, 6, 7, 8, '...', 20],
+            [1, 2, 3, 4, 5, 6, 7, 8, '...', 20],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, '...', 20],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '...', 20],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, '...', 20],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, '...', 20],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, '...', 20],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, '...', 20],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, '...', 20],
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, '...', 20],
+            [1, '...', 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, '...', 20],
+            [1, '...', 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, '...', 20],
+            [1, '...', 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            [1, '...', 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            [1, '...', 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            [1, '...', 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            [1, '...', 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            [1, '...', 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            [1, '...', 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            [1, '...', 12, 13, 14, 15, 16, 17, 18, 19, 20],
+            [1, '...', 13, 14, 15, 16, 17, 18, 19, 20],
+            [1, 2, 3, 4, 5, 6, 7, 8, '...', 20]
+        ];
 
         for ($i = 0; $i < 22; $i++) {
             $nav = new Pagination($i, 10, 200, 7);
-            $this->assertEquals(count($nav->get()), $counts[$i]);
+            $this->assertEquals($nav->get(), $results[$i]);
         }
     }
 
@@ -47,7 +70,7 @@ class PaginationTest extends TestCase
     {
         $nav1 = new Pagination(1, 10, 20);
         $nav2 = new Pagination(2, 20, 30);
-        $this->assertEquals($nav1->getEnd(), 10);
-        $this->assertEquals($nav2->getEnd(), 30);
+        $this->assertEquals(10, $nav1->getEnd());
+        $this->assertEquals(30, $nav2->getEnd());
     }
 }
