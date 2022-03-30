@@ -29,7 +29,7 @@ class Pagination
      */
     public function __construct(int $page, int $limit, int $total, int $length = 3, bool $uiKeys = false)
     {
-        $this->totalPages = (int) ceil($total / $limit);
+        $this->totalPages = (int)ceil($total / $limit);
         $this->page = $page > 1 ? ($page > $this->totalPages ? 1 : $page) : 1;
         $this->limit = $limit > 0 ? $limit : 10;
         $this->total = $total;
@@ -135,7 +135,6 @@ class Pagination
         $result = [];
         $for = [];
 
-        if ($this->pos !== 'full') {
             if ($this->page - $this->length > 1) {
                 $result[] = 1;
             }
@@ -151,9 +150,8 @@ class Pagination
                     $for[] = $value;
                 }
             }
-        }
 
-        return array_merge($result, array_reverse($for));
+        return $this->pos === 'full' ? [] : array_merge($result, array_reverse($for));
     }
 
     /**
@@ -163,25 +161,23 @@ class Pagination
     {
         $result = [];
 
-        if ($this->pos !== 'full') {
-            foreach (range($this->page + 1, $this->page + $this->length) as $value) {
-                if ($value <= $this->totalPages) {
-                    $result[] = $value;
-                }
-            }
-            if ($this->pos !== 'noRightDots') {
-                if ($this->uiKeys) {
-                    $result['rightDots'] = '...';
-                } else {
-                    $result[] = '...';
-                }
-            }
-            if ($this->totalPages - $this->page - $this->length > 0) {
-                $result[] = $this->totalPages;
+        foreach (range($this->page + 1, $this->page + $this->length) as $value) {
+            if ($value <= $this->totalPages) {
+                $result[] = $value;
             }
         }
+        if ($this->pos !== 'noRightDots') {
+            if ($this->uiKeys) {
+                $result['rightDots'] = '...';
+            } else {
+                $result[] = '...';
+            }
+        }
+        if ($this->totalPages - $this->page - $this->length > 0) {
+            $result[] = $this->totalPages;
+        }
 
-        return $result;
+        return $this->pos === 'full' ? [] : $result;
     }
 
     /**
