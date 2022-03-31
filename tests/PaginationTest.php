@@ -64,6 +64,9 @@ class PaginationTest extends TestCase
             $nav = new Pagination($i, 10, 200, 7);
             $this->assertEquals($nav->get(), $results[$i]);
         }
+
+        $nav = new Pagination(3, 10, 50, 2);
+        $this->assertEquals($nav->get(), range(1, 5));
     }
 
     public function testGetEnd(): void

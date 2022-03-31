@@ -26,7 +26,7 @@ class Pagination
      */
     public function __construct(int $page, int $limit, int $total, int $length = 3)
     {
-        $this->totalPages = (int)ceil($total / $limit);
+        $this->totalPages = (int) ceil($total / $limit);
         $this->page = $page > 1 ? ($page > $this->totalPages ? 1 : $page) : 1;
         $this->limit = $limit > 0 ? $limit : 10;
         $this->total = $total;
