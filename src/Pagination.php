@@ -18,45 +18,20 @@ class Pagination
 
     private string $pos;
 
-    private bool $uiKeys;
-
     /**
      * @param int $page
      * @param int $limit
      * @param int $total
      * @param int $length
-     * @param bool $uiKeys
      */
-    public function __construct(int $page, int $limit, int $total, int $length = 3, bool $uiKeys = false)
+    public function __construct(int $page, int $limit, int $total, int $length = 3)
     {
-        $this->totalPages = (int) ceil($total / $limit);
+        $this->totalPages = (int)ceil($total / $limit);
         $this->page = $page > 1 ? ($page > $this->totalPages ? 1 : $page) : 1;
         $this->limit = $limit > 0 ? $limit : 10;
         $this->total = $total;
         $this->length = $length >= 0 ? $length : 3;
         $this->pos = $this->init();
-        $this->uiKeys = $uiKeys;
-    }
-
-    private function init(): string
-    {
-        switch ($this->page) {
-            case ($this->totalPages < 7):
-            default:
-                $pos = 'full';
-                break;
-            case (($this->page - $this->length) < 3):
-                $pos = 'noLeftDots';
-                break;
-            case (($this->page - $this->length) >= 3 && ($this->totalPages - $this->page - $this->length) > 1):
-                $pos = 'center';
-                break;
-            case (abs($this->totalPages - $this->page - $this->length) >= 0):
-                $pos = 'noRightDots';
-                break;
-        }
-
-        return $pos;
     }
 
     /**
@@ -86,61 +61,57 @@ class Pagination
     /**
      * @return array
      */
-    private function uiStart(): array
+    public function get(): array
     {
-        $result = [];
-
-        if ($this->page > 1) {
-            $result['prev'] = $this->page - 1;
-        }
-        if ($this->page !== 1) {
-            $result['first'] = 1;
-        }
-        if ($this->page > 3) {
-            $result['second'] = 2;
-        }
-
-        return $result;
+        return array_merge($this->leftPad(), $this->getCurrent(), $this->rightPad());
     }
 
     /**
-     * @return array
+     * @return int
      */
-    private function start(): array
+    public function getTotalPages(): int
     {
-        $result = $this->uiKeys ? $this->uiStart() : [];
-
-        return $this->pos !== 'full' ? $result : [];
+        return $this->totalPages;
     }
 
     /**
-     * @return array
+     * @return int|null
      */
-    private function uiEnd(): array
+    public function getNextPage(): ?int
     {
-        $result = [];
-
-        if ($this->page !== $this->totalPages) {
-            $result['last'] = $this->totalPages;
-        }
-        if ($this->totalPages - $this->page > 0) {
-            $result['next'] = $this->page + 1;
-        }
-        if ($this->totalPages - $this->page + $this->length > 3) {
-            $result['preLast'] = $this->totalPages - 1;
-        }
-
-        return $result;
+        return $this->totalPages - $this->page > 0 ? $this->page + 1 : null;
     }
 
     /**
-     * @return array
+     * @return int|null
      */
-    private function end(): array
+    public function getPreviousPage(): ?int
     {
-        $result = $this->uiKeys ? $this->uiEnd() : [];
+        return $this->page > 1 ? $this->page - 1 : null;
+    }
 
-        return $this->pos !== 'full' ? $result : [];
+    /**
+     * @return string
+     */
+    private function init(): string
+    {
+        switch ($this->page) {
+            case ($this->totalPages < 7):
+            default:
+                $pos = 'full';
+                break;
+            case (($this->page - $this->length) < 3):
+                $pos = 'noLeftDots';
+                break;
+            case (($this->page - $this->length) >= 3 && ($this->totalPages - $this->page - $this->length) > 1):
+                $pos = 'center';
+                break;
+            case (abs($this->totalPages - $this->page - $this->length) >= 0):
+                $pos = 'noRightDots';
+                break;
+        }
+
+        return $pos;
     }
 
     /**
@@ -148,17 +119,7 @@ class Pagination
      */
     private function leftDots(): array
     {
-        $result = [];
-
-        if ($this->pos !== 'noLeftDots') {
-            if ($this->uiKeys) {
-                $result['leftDots'] = '...';
-            } else {
-                $result[] = '...';
-            }
-        }
-
-        return $result;
+        return $this->pos !== 'noLeftDots' ? ['...'] : [];
     }
 
     /**
@@ -167,18 +128,18 @@ class Pagination
     private function leftPad(): array
     {
         $result = [];
-        $for = [];
 
-        if ($this->page - $this->length > 1) {
-            $result[] = 1;
-        }
         foreach (range($this->page - 1, $this->page - $this->length) as $value) {
             if ($value > 0) {
-                $for[] = $value;
+                $result[] = $value;
             }
         }
 
-        return $this->pos === 'full' ? [] : array_merge($result, $this->leftDots(), array_reverse($for));
+        return $this->pos === 'full' ? [] : array_merge(
+            ($this->getFirstPage() ? [$this->getFirstPage()] : []),
+            $this->leftDots(),
+            array_reverse($result)
+        );
     }
 
     /**
@@ -186,17 +147,7 @@ class Pagination
      */
     private function rightDots(): array
     {
-        $result = [];
-
-        if ($this->pos !== 'noRightDots') {
-            if ($this->uiKeys) {
-                $result['rightDots'] = '...';
-            } else {
-                $result[] = '...';
-            }
-        }
-
-        return $result;
+        return $this->pos !== 'noRightDots' ? ['...'] : [];
     }
 
     /**
@@ -212,27 +163,11 @@ class Pagination
             }
         }
 
-        $last = ($this->totalPages - $this->page - $this->length > 0) ? [$this->totalPages] : [];
-
-        return $this->pos === 'full' ? [] : array_merge($result, $this->rightDots(), $last);
-    }
-
-    /**
-     * @return array
-     */
-    private function full(): array
-    {
-        $result = [];
-
-        foreach (range(1, $this->totalPages) as $value) {
-            if ($this->uiKeys && $value === $this->page) {
-                $result['current'] = $value;
-            } else {
-                $result[] = $value;
-            }
-        }
-
-        return $result;
+        return $this->pos === 'full' ? [] : array_merge(
+            $result,
+            $this->rightDots(),
+            ($this->getLastPage() ? [$this->getLastPage()] : [])
+        );
     }
 
     /**
@@ -240,32 +175,29 @@ class Pagination
      */
     private function getCurrent(): array
     {
-        if ($this->uiKeys) {
-            $result['current'] = $this->page;
-        } else {
-            $result[] = $this->page;
-        }
+        $result[] = $this->page;
 
         if ($this->pos === 'full') {
-            $result = $this->full();
+            $result = range(1, $this->totalPages);
         }
 
         return $result;
     }
 
     /**
-     * @return array
+     * @return int|null
      */
-    public function get(): array
+    private function getFirstPage(): ?int
     {
-        return array_merge($this->start(), $this->leftPad(), $this->getCurrent(), $this->rightPad(), $this->end());
+        return $this->page - $this->length > 1 ? 1 : null;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getTotalPages(): int
+
+    private function getLastPage(): ?int
     {
-        return $this->totalPages;
+        return $this->totalPages - $this->page - $this->length > 0 ? $this->totalPages : null;
     }
 }

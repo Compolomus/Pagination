@@ -73,4 +73,26 @@ class PaginationTest extends TestCase
         $this->assertEquals(10, $nav1->getEnd());
         $this->assertEquals(30, $nav2->getEnd());
     }
+
+    public function testGetTotalPages(): void
+    {
+        $nav = new Pagination(1, 10, 200);
+        $this->assertEquals(20, $nav->getTotalPages());
+    }
+
+    public function testGetNextPage(): void
+    {
+        $nav = new Pagination(1, 10, 200);
+        $nav2 = new Pagination(10, 10, 100);
+        $this->assertEquals(2, $nav->getNextPage());
+        $this->assertNull($nav2->getNextPage());
+    }
+
+    public function testGetPreviousPage(): void
+    {
+        $nav = new Pagination(3, 10, 200);
+        $nav2 = new Pagination(1, 10, 100);
+        $this->assertEquals(2, $nav->getPreviousPage());
+        $this->assertNull($nav2->getPreviousPage());
+    }
 }
